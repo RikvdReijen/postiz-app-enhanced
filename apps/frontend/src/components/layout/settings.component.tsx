@@ -35,6 +35,7 @@ import { ApprovedAppsComponent } from '@gitroom/frontend/components/approved-app
 import { DriveSync } from '@gitroom/frontend/components/postpls/drive.sync';
 import { PlannerSettings } from '@gitroom/frontend/components/postpls/planner.settings';
 import { QuickAccess } from '@gitroom/frontend/components/postpls/quick.access';
+import { MobilePairing } from '@gitroom/frontend/components/postpls/mobile.pairing';
 export const SettingsPopup: FC<{
   getRef?: Ref<any>;
 }> = (props) => {
@@ -114,6 +115,7 @@ export const SettingsPopup: FC<{
     arr.push({ tab: 'planner', label: t('planner', 'Planner') });
     arr.push({ tab: 'drive_sync', label: t('drive_sync', 'Google Drive Sync') });
     arr.push({ tab: 'quick_access', label: t('quick_access', 'Quick Access') });
+    arr.push({ tab: 'mobile_app', label: t('mobile_app', 'Mobile App') });
 
     return arr;
   }, [user, isGeneral, showLogout, t]);
@@ -232,6 +234,12 @@ export const SettingsPopup: FC<{
               {tab === 'quick_access' && (
                 <div>
                   <QuickAccess />
+                </div>
+              )}
+
+              {tab === 'mobile_app' && (
+                <div>
+                  <MobilePairing />
                 </div>
               )}
             </div>

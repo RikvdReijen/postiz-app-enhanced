@@ -56,6 +56,7 @@ import { PlannerService } from '@gitroom/nestjs-libraries/database/prisma/planne
 import { QuickAccessRepository } from '@gitroom/nestjs-libraries/database/prisma/quick-access/quick.access.repository';
 import { QuickAccessService } from '@gitroom/nestjs-libraries/database/prisma/quick-access/quick.access.service';
 import { HostStatusService } from '@gitroom/nestjs-libraries/host/host.status.service';
+import { MobilePairingService } from '@gitroom/nestjs-libraries/mobile/mobile.pairing.service';
 
 @Global()
 @Module({
@@ -120,6 +121,7 @@ import { HostStatusService } from '@gitroom/nestjs-libraries/host/host.status.se
     QuickAccessRepository,
     QuickAccessService,
     HostStatusService,
+    MobilePairingService,
   ],
   get exports() {
     return this.providers;

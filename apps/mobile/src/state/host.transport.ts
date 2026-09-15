@@ -1,0 +1,81 @@
+import { SyncBundle } from '@gitroom/helpers/sync/sync.bundle';
+import { Pairing } from '@postpls/state/pairing';
+
+const PING_TIMEOUT_MS = 4000;
+
+export interface HostHealth {
+  healthy: boolean;
+  services: { api: string; database: string; orchestrator: string };
+}
+
+/**
+ * Talks to the host directly. Preferred whenever the machine is actually on,
+ * because it is a single round trip and the host is the source of truth.
+ */
+export class HostTransport {
+  constructor(private pairing: Pairing) {}
+
+  private request(path: string, init: RequestInit = {}) {
+    return fetch(`${this.pairing.apiUrl}${path}`, {
+      ...init,
+      headers: {
+        'content-type': 'application/json',
+        auth: this.pairing.token,
+        showorg: this.pairing.organizationId,
+        ...(init.headers || {}),
+      },
+    });
+  }
+
+  /**
+   * A self-hosted machine that is asleep does not refuse the connection, it
+   * simply never answers, so this has to time out rather than wait.
+   */
+  async ping(): Promise<boolean> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), PING_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(`${this.pairing.apiUrl}/host/status`, {
+        signal: controller.signal,
+      });
+      return response.ok;
+    } catch (err) {
+      return false;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  async health(): Promise<HostHealth | null> {
+    try {
+      const response = await this.request('/host/health');
+      return response.ok ? ((await response.json()) as HostHealth) : null;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  async pull(): Promise<SyncBundle> {
+    const response = await this.request('/drive-sync/bundle');
+    if (!response.ok) {
+      throw new Error(`Host refused the bundle (${response.status})`);
+    }
+
+    return (await response.json()) as SyncBundle;
+  }
+
+  /** The host merges and hands back the authoritative result. */
+  async push(bundle: SyncBundle): Promise<SyncBundle> {
+    const response = await this.request('/drive-sync/bundle', {
+      method: 'POST',
+      body: JSON.stringify(bundle),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Host rejected the bundle (${response.status})`);
+    }
+
+    return (await response.json()) as SyncBundle;
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "postpls-mobile",
+  "version": "1.0.0",
+  "description": "PostPls Android app \u2014 drafts and scheduling that keep working while the host is off",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/copy-brand-assets.mjs && vite",
+    "prebuild": "node scripts/copy-brand-assets.mjs",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "setup:android": "node scripts/setup-android.mjs",
+    "sync:android": "pnpm run build && cap sync android && node scripts/apply-overlay.mjs",
+    "open:android": "cap open android"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "AGPL-3.0"
+}

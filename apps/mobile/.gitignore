@@ -1,0 +1,5 @@
+dist/
+public/postpls/
+# The generated Capacitor project only. Anchored with a leading slash so it
+# does not also swallow native/android, which is the part we actually wrote.
+/android/

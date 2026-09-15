@@ -1,0 +1,17 @@
+// Merge these into android/app/build.gradle after `npx cap add android`.
+// scripts/apply-overlay.mjs prints this file rather than editing Gradle for
+// you, because the generated build file changes between Capacitor versions.
+
+android {
+    defaultConfig {
+        // Fills ${postplsHost} in AndroidManifest.xml, so App Links verify
+        // against your own host rather than a hardcoded domain.
+        manifestPlaceholders = [postplsHost: project.findProperty("postplsHost") ?: "postpls.local"]
+    }
+}
+
+dependencies {
+    // Google sign-in + Drive token minting for the offline sync path.
+    implementation "com.google.android.gms:play-services-auth:21.2.0"
+    implementation "androidx.core:core-ktx:1.13.1"
+}
