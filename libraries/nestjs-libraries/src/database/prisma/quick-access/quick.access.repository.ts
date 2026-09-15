@@ -35,7 +35,9 @@ export class QuickAccessRepository {
     };
 
     return this._quickAccessTag.model.quickAccessTag.upsert({
-      where: { id: body.id || '' },
+      // Scoped to the organization so a known tag id from another workspace
+      // cannot be re-pointed through this endpoint.
+      where: { id: body.id || '', organizationId: orgId },
       create: { organizationId: orgId, ...data },
       update: data,
       select: { id: true },

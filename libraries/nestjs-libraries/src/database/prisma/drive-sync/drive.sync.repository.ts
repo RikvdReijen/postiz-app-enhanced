@@ -6,7 +6,8 @@ import { SyncPost } from '@gitroom/helpers/sync/sync.bundle';
 export class DriveSyncRepository {
   constructor(
     private _driveSyncState: PrismaRepository<'driveSyncState'>,
-    private _post: PrismaRepository<'post'>
+    private _post: PrismaRepository<'post'>,
+    private _integration: PrismaRepository<'integration'>
   ) {}
 
   getState(orgId: string) {
@@ -112,6 +113,20 @@ export class DriveSyncRepository {
         integration: { select: { providerIdentifier: true } },
       },
     });
+  }
+
+  /**
+   * Narrows a list of integration ids to the ones this organization actually
+   * owns. The ids arrive inside a bundle, which is attacker-controlled input as
+   * far as the host is concerned, so they cannot be trusted as foreign keys.
+   */
+  async getOwnedIntegrationIds(orgId: string, ids: string[]) {
+    const rows = await this._integration.model.integration.findMany({
+      where: { organizationId: orgId, id: { in: ids }, deletedAt: null },
+      select: { id: true },
+    });
+
+    return new Set(rows.map((row) => row.id));
   }
 
   /**

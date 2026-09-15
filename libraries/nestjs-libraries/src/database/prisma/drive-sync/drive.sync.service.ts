@@ -205,13 +205,25 @@ export class DriveSyncService {
     );
     const byId = new Map(existing.map((post) => [post.id, post]));
 
+    // A bundle is attacker-controlled input — it came off a file in a Drive we
+    // do not own — so an integration id in it is a claim, not a fact.
+    const ownedIntegrations =
+      await this._driveSyncRepository.getOwnedIntegrationIds(
+        orgId,
+        fromMobile.flatMap((post) => (post.integrationId ? [post.integrationId] : []))
+      );
+
     let applied = 0;
     for (const post of fromMobile) {
       const current = byId.get(post.id);
 
       if (!current) {
         // A post drafted on the phone while the host was off.
-        if (post.deletedAt || !post.integrationId) {
+        if (
+          post.deletedAt ||
+          !post.integrationId ||
+          !ownedIntegrations.has(post.integrationId)
+        ) {
           continue;
         }
 
