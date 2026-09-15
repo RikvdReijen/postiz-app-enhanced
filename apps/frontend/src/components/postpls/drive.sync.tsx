@@ -120,7 +120,7 @@ export const DriveSync: FC = () => {
   if (!data?.configured) {
     return (
       <div className="flex flex-col gap-[12px]">
-        <h2 className="text-[20px]">{t('drive_sync', 'Google Drive Sync')}</h2>
+        <h3 className="text-[20px]">{t('drive_sync', 'Google Drive Sync')}</h3>
         <div className="text-textItemBlur text-[14px]">
           {t(
             'drive_not_configured',
@@ -134,7 +134,7 @@ export const DriveSync: FC = () => {
   return (
     <div className="flex flex-col gap-[16px]">
       <div className="flex flex-col gap-[4px]">
-        <h2 className="text-[20px]">{t('drive_sync', 'Google Drive Sync')}</h2>
+        <h3 className="text-[20px]">{t('drive_sync', 'Google Drive Sync')}</h3>
         <div className="text-textItemBlur text-[14px]">
           {t(
             'drive_sync_description',
@@ -150,7 +150,7 @@ export const DriveSync: FC = () => {
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-[14px] bg-newBgLineColor rounded-[8px] p-[16px]">
+        <div className="flex flex-col gap-[14px] bg-sixth border-fifth border rounded-[4px] p-[24px]">
           <Row
             label={t('drive_account', 'Account')}
             value={data.accountEmail || '—'}
@@ -178,7 +178,7 @@ export const DriveSync: FC = () => {
           />
 
           {!!data.lastError && (
-            <div className="text-[13px] text-ai">{data.lastError}</div>
+            <div className="text-[13px] text-red-400">{data.lastError}</div>
           )}
 
           <div className="flex gap-[10px] flex-wrap">

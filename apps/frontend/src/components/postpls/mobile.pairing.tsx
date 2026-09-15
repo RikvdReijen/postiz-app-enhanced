@@ -22,7 +22,9 @@ interface Pairing {
 const useMobilePairing = (enabled: boolean) => {
   const fetch = useFetch();
   const load = useCallback(async () => {
-    return (await fetch('/mobile/pairing')).json() as Promise<Pairing>;
+    return (
+      await fetch('/mobile/pairing', { method: 'POST' })
+    ).json() as Promise<Pairing>;
   }, [fetch]);
 
   return useSWR<Pairing>(enabled ? 'mobile-pairing' : null, load, {
@@ -52,7 +54,7 @@ export const MobilePairing: FC = () => {
   return (
     <div className="flex flex-col gap-[16px]">
       <div className="flex flex-col gap-[4px]">
-        <h2 className="text-[20px]">{t('mobile_app', 'Mobile App')}</h2>
+        <h3 className="text-[20px]">{t('mobile_app', 'Mobile App')}</h3>
         <div className="text-textItemBlur text-[14px]">
           {t(
             'mobile_app_description',
@@ -61,8 +63,8 @@ export const MobilePairing: FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-[14px] bg-newBgLineColor rounded-[8px] p-[16px]">
-        <div className="text-[13px] text-ai">
+      <div className="flex flex-col gap-[14px] bg-sixth border-fifth border rounded-[4px] p-[24px]">
+        <div className="text-[13px] text-red-400">
           {t(
             'mobile_pairing_warning',
             'The pairing code signs your phone in as you. Treat it like a password and only scan it with your own device.'

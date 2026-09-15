@@ -1,3 +1,5 @@
+import { BRAND_DEEP_LINK_SCHEME } from '@gitroom/helpers/branding/branding';
+import { quickAccessDeepLink } from '@gitroom/helpers/branding/quick.access.link';
 import { readJson, STORAGE_KEYS, writeJson } from '@postpls/state/storage';
 
 export interface QuickAction {
@@ -31,9 +33,17 @@ export const DEFAULT_SETTINGS: MobileSettings = {
   watchLinkedOnly: true,
   watchedPackages: [],
   quickActions: [
-    { id: 'new', label: 'New post', deepLink: 'postpls://open?target=NEW_POST' },
-    { id: 'calendar', label: 'Calendar', deepLink: 'postpls://open?target=CALENDAR' },
-    { id: 'sync', label: 'Sync now', deepLink: 'postpls://action?do=sync' },
+    {
+      id: 'new',
+      label: 'New post',
+      deepLink: quickAccessDeepLink({ target: 'NEW_POST' }),
+    },
+    {
+      id: 'calendar',
+      label: 'Calendar',
+      deepLink: quickAccessDeepLink({ target: 'CALENDAR' }),
+    },
+    { id: 'sync', label: 'Sync now', deepLink: `${BRAND_DEEP_LINK_SCHEME}://action?do=sync` },
   ],
   hostMacAddress: '',
 };

@@ -1,6 +1,7 @@
 'use client';
 
 import { FC, useCallback, useEffect, useState } from 'react';
+import useSWR from 'swr';
 import QRCode from 'qrcode';
 import { BrandLogoId, getBrandLogo, BRAND_COLORS } from '@gitroom/helpers/branding/branding';
 
@@ -45,35 +46,51 @@ const buildBrandedQr = async (
   return qr.replace('</svg>', `${overlay}</svg>`);
 };
 
+/**
+ * The marks are static files under /public rather than API responses, so this
+ * deliberately does not go through `useFetch` — but it is still SWR, so the
+ * four of them are fetched once and shared by every code on the screen.
+ */
+const useBrandMarkSvg = (logo?: BrandLogoId | string | null) => {
+  const path = getBrandLogo(logo).mark;
+  const load = useCallback(async (key: string) => {
+    return (await fetch(key)).text();
+  }, []);
+
+  return useSWR(path, load, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+  });
+};
+
 export const useBrandedQr = (
   url: string,
   logo?: BrandLogoId | string | null,
   accentColor?: string | null
 ) => {
+  const { data: markSvg } = useBrandMarkSvg(logo);
   const [svg, setSvg] = useState('');
 
   useEffect(() => {
+    if (!markSvg || !url) {
+      setSvg('');
+      return;
+    }
+
     let cancelled = false;
+    buildBrandedQr(url, markSvg, accentColor || BRAND_COLORS.ink)
+      .then((built) => {
+        if (!cancelled) {
+          setSvg(built);
+        }
+      })
+      .catch(() => setSvg(''));
 
-    const run = async () => {
-      const mark = getBrandLogo(logo);
-      const markSvg = await (await fetch(mark.mark)).text();
-      const built = await buildBrandedQr(
-        url,
-        markSvg,
-        accentColor || BRAND_COLORS.ink
-      );
-
-      if (!cancelled) {
-        setSvg(built);
-      }
-    };
-
-    run().catch(() => setSvg(''));
     return () => {
       cancelled = true;
     };
-  }, [url, logo, accentColor]);
+  }, [url, markSvg, accentColor]);
 
   return svg;
 };

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Connection } from '@temporalio/client';
-import { PrismaRepository } from '@gitroom/nestjs-libraries/database/prisma/prisma.service';
+import { HostRepository } from '@gitroom/nestjs-libraries/database/prisma/host/host.repository';
 import { BRAND_NAME } from '@gitroom/helpers/branding/branding';
 
 export type ServiceStatus = 'up' | 'down';
@@ -16,7 +16,7 @@ const TEMPORAL_TIMEOUT_MS = 5000;
  */
 @Injectable()
 export class HostStatusService {
-  constructor(private _prisma: PrismaRepository<'announcement'>) {}
+  constructor(private _hostRepository: HostRepository) {}
 
   /** Cheap enough to poll, and says nothing about who the host belongs to. */
   getPublicStatus() {
@@ -49,7 +49,7 @@ export class HostStatusService {
 
   private async checkDatabase(): Promise<ServiceStatus> {
     try {
-      await this._prisma.model.announcement.findFirst({ select: { id: true } });
+      await this._hostRepository.checkConnection();
       return 'up';
     } catch (err) {
       return 'down';

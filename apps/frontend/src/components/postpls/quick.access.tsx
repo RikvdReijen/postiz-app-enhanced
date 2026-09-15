@@ -16,7 +16,10 @@ import {
   BrandLogoId,
   DEFAULT_BRAND_LOGO,
 } from '@gitroom/helpers/branding/branding';
-import { QuickAccessTarget } from '@gitroom/helpers/branding/quick.access.link';
+import {
+  QUICK_ACCESS_TARGETS,
+  QuickAccessTarget,
+} from '@gitroom/helpers/branding/quick.access.link';
 import {
   QrPreview,
   useBrandedQr,
@@ -49,13 +52,21 @@ interface Integration {
   identifier: string;
 }
 
-const TARGET_LABELS: Record<QuickAccessTarget, string> = {
-  CALENDAR: 'Open the calendar',
-  NEW_POST: 'Start a new post',
-  ANALYTICS: 'Open analytics',
-  SETTINGS: 'Open settings',
-  PROVIDER: 'New post on a platform',
-  ACCOUNT: 'New post on one account',
+/**
+ * Literal keys and literal fallbacks, so the translation extractor can see
+ * them — a key built from a template literal is invisible to it.
+ */
+const useTargetLabels = (): Record<QuickAccessTarget, string> => {
+  const t = useT();
+
+  return {
+    CALENDAR: t('quick_access_target_calendar', 'Open the calendar'),
+    NEW_POST: t('quick_access_target_new_post', 'Start a new post'),
+    ANALYTICS: t('quick_access_target_analytics', 'Open analytics'),
+    SETTINGS: t('quick_access_target_settings', 'Open settings'),
+    PROVIDER: t('quick_access_target_provider', 'New post on a platform'),
+    ACCOUNT: t('quick_access_target_account', 'New post on one account'),
+  };
 };
 
 const useQuickAccessTags = () => {
@@ -93,6 +104,7 @@ const TagForm: FC<{
   const t = useT();
   const fetch = useFetch();
   const toaster = useToaster();
+  const targetLabels = useTargetLabels();
 
   const [name, setName] = useState(tag?.name || '');
   const [target, setTarget] = useState<QuickAccessTarget>(
@@ -176,9 +188,9 @@ const TagForm: FC<{
         value={target}
         onChange={(e) => setTarget(e.target.value as QuickAccessTarget)}
       >
-        {(Object.keys(TARGET_LABELS) as QuickAccessTarget[]).map((key) => (
+        {QUICK_ACCESS_TARGETS.map((key) => (
           <option key={key} value={key}>
-            {t(`quick_access_target_${key.toLowerCase()}`, TARGET_LABELS[key])}
+            {targetLabels[key]}
           </option>
         ))}
       </Select>
@@ -267,6 +279,7 @@ const TagCard: FC<{ tag: QuickAccessTag; onChanged: () => void }> = ({
   const t = useT();
   const fetch = useFetch();
   const toaster = useToaster();
+  const targetLabels = useTargetLabels();
   const svg = useBrandedQr(tag.url, tag.logo, tag.accentColor);
   const { download, print } = useQrActions(tag.name, svg);
   const nfc = useNfcWriter();
@@ -303,15 +316,12 @@ const TagCard: FC<{ tag: QuickAccessTag; onChanged: () => void }> = ({
   }, [fetch, onChanged, t, tag.id]);
 
   return (
-    <div className="flex gap-[16px] bg-newBgLineColor rounded-[8px] p-[16px]">
+    <div className="flex gap-[16px] bg-sixth border-fifth border rounded-[4px] p-[24px]">
       <QrPreview svg={svg} size={160} />
       <div className="flex flex-col gap-[8px] flex-1 min-w-0">
         <div className="text-newTextColor text-[16px] font-[600]">{tag.name}</div>
         <div className="text-textItemBlur text-[13px]">
-          {t(
-            `quick_access_target_${tag.target.toLowerCase()}`,
-            TARGET_LABELS[tag.target]
-          )}
+          {targetLabels[tag.target]}
           {!!tag.integration && ` · ${tag.integration.name}`}
           {!tag.integration && !!tag.providerIdentifier && ` · ${tag.providerIdentifier}`}
         </div>
@@ -374,7 +384,7 @@ export const QuickAccess: FC = () => {
     <div className="flex flex-col gap-[16px]">
       <div className="flex justify-between items-start gap-[20px]">
         <div className="flex flex-col gap-[4px]">
-          <h2 className="text-[20px]">{t('quick_access', 'Quick Access')}</h2>
+          <h3 className="text-[20px]">{t('quick_access', 'Quick Access')}</h3>
           <div className="text-textItemBlur text-[14px]">
             {t(
               'quick_access_description',

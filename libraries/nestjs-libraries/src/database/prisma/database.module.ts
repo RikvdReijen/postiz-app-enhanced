@@ -55,6 +55,7 @@ import { PlannerRepository } from '@gitroom/nestjs-libraries/database/prisma/pla
 import { PlannerService } from '@gitroom/nestjs-libraries/database/prisma/planner/planner.service';
 import { QuickAccessRepository } from '@gitroom/nestjs-libraries/database/prisma/quick-access/quick.access.repository';
 import { QuickAccessService } from '@gitroom/nestjs-libraries/database/prisma/quick-access/quick.access.service';
+import { HostRepository } from '@gitroom/nestjs-libraries/database/prisma/host/host.repository';
 import { HostStatusService } from '@gitroom/nestjs-libraries/host/host.status.service';
 import { MobilePairingService } from '@gitroom/nestjs-libraries/mobile/mobile.pairing.service';
 
@@ -120,6 +121,7 @@ import { MobilePairingService } from '@gitroom/nestjs-libraries/mobile/mobile.pa
     PlannerService,
     QuickAccessRepository,
     QuickAccessService,
+    HostRepository,
     HostStatusService,
     MobilePairingService,
   ],

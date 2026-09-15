@@ -10,14 +10,12 @@ export const BRAND_NAME = 'PostPls';
 export const BRAND_EMOJI = '✉️🙏';
 export const BRAND_TAGLINE = 'Opinionated version of Postiz';
 export const BRAND_UPSTREAM_NAME = 'Postiz';
-export const BRAND_UPSTREAM_REPOSITORY = 'https://github.com/gitroomhq/postiz-app';
 
 /**
  * Custom scheme used by QR codes, NFC tags and the Android app so a scan can
  * jump straight into a screen instead of landing on the dashboard.
  */
 export const BRAND_DEEP_LINK_SCHEME = 'postpls';
-export const BRAND_ANDROID_APPLICATION_ID = 'app.postpls.mobile';
 
 /**
  * The folder PostPls owns inside the user's Google Drive. Both the host and the

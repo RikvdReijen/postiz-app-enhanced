@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Organization, User } from '@prisma/client';
 import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.request';
@@ -10,7 +10,9 @@ import { MobilePairingService } from '@gitroom/nestjs-libraries/mobile/mobile.pa
 export class MobileController {
   constructor(private _mobilePairingService: MobilePairingService) {}
 
-  @Get('/pairing')
+  // POST, not GET: each call mints a fresh credential, and a GET that hands
+  // back a secret is the kind of thing proxies and logs are happy to keep.
+  @Post('/pairing')
   async getPairing(
     @GetUserFromRequest() user: User,
     @GetOrgFromRequest() org: Organization

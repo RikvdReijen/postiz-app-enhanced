@@ -78,7 +78,7 @@ export const PlannerSettings: FC = () => {
   return (
     <div className="flex flex-col gap-[16px]">
       <div className="flex flex-col gap-[4px]">
-        <h2 className="text-[20px]">{t('planner', 'Planner')}</h2>
+        <h3 className="text-[20px]">{t('planner', 'Planner')}</h3>
         <div className="text-textItemBlur text-[14px]">
           {t(
             'planner_description',
@@ -87,7 +87,7 @@ export const PlannerSettings: FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-[14px] bg-newBgLineColor rounded-[8px] p-[16px]">
+      <div className="flex flex-col gap-[14px] bg-sixth border-fifth border rounded-[4px] p-[24px]">
         <Select
           label={t('planner_interval', 'Check for new posts every')}
           name="scanIntervalMinutes"

@@ -18,12 +18,6 @@ export class QuickAccessRepository {
     });
   }
 
-  getTag(orgId: string, id: string) {
-    return this._quickAccessTag.model.quickAccessTag.findFirst({
-      where: { id, organizationId: orgId, deletedAt: null },
-    });
-  }
-
   upsertTag(orgId: string, body: QuickAccessTagDto) {
     const data = {
       name: body.name,

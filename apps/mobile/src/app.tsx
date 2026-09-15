@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { SyncBundle, SyncPost, emptySyncBundle } from '@gitroom/helpers/sync/sync.bundle';
-import { BRAND_NAME } from '@gitroom/helpers/branding/branding';
+import { BRAND_EMOJI, BRAND_NAME } from '@gitroom/helpers/branding/branding';
 import {
   clearPairing,
   loadPairing,
@@ -249,7 +249,7 @@ export const App: FC = () => {
   if (!booted) {
     return (
       <div className="h-full flex items-center justify-center text-textItemBlur">
-        {BRAND_NAME}
+        {BRAND_NAME} {BRAND_EMOJI}
       </div>
     );
   }

@@ -31,10 +31,20 @@ export class PlannerRepository {
   }
 
   upsertSettings(orgId: string, body: PlannerSettingsDto) {
+    // Mapped field by field rather than spread: the global ValidationPipe runs
+    // without `whitelist`, so unknown keys survive onto the DTO instance, and a
+    // spread would let a request body carry its own organizationId straight
+    // into Prisma.
+    const data = {
+      scanIntervalMinutes: body.scanIntervalMinutes,
+      lookbackHours: body.lookbackHours,
+      paused: body.paused,
+    };
+
     return this._plannerSettings.model.plannerSettings.upsert({
       where: { organizationId: orgId },
-      create: { organizationId: orgId, ...body },
-      update: body,
+      create: { organizationId: orgId, ...data },
+      update: data,
     });
   }
 
