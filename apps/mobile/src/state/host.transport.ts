@@ -30,18 +30,33 @@ export class HostTransport {
   /**
    * A self-hosted machine that is asleep does not refuse the connection, it
    * simply never answers, so this has to time out rather than wait.
+   *
+   * The timeout is a race rather than just an AbortController: CapacitorHttp
+   * replaces `fetch` with a native implementation so the app is not blocked by
+   * the host's CORS policy, and it does not honour `signal`. The controller is
+   * still passed so the request is actually cancelled on the web, where this
+   * screen runs during development.
    */
   async ping(): Promise<boolean> {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), PING_TIMEOUT_MS);
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
+    const expired = new Promise<false>((resolve) => {
+      timeout = setTimeout(() => {
+        controller.abort();
+        resolve(false);
+      }, PING_TIMEOUT_MS);
+    });
 
     try {
-      const response = await fetch(`${this.pairing.apiUrl}/host/status`, {
-        signal: controller.signal,
-      });
-      return response.ok;
-    } catch (err) {
-      return false;
+      return await Promise.race([
+        fetch(`${this.pairing.apiUrl}/host/status`, {
+          signal: controller.signal,
+        })
+          .then((response) => response.ok)
+          .catch(() => false),
+        expired,
+      ]);
     } finally {
       clearTimeout(timeout);
     }
