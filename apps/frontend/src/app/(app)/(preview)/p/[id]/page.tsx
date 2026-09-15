@@ -13,10 +13,11 @@ import { CopyClient } from '@gitroom/frontend/components/preview/copy.client';
 import { getT } from '@gitroom/react/translation/get.translation.service.backend';
 import { RenderPreviewDateClient } from '@gitroom/frontend/components/preview/render.preview.date.client';
 import { CreationMethodBadge } from '@gitroom/frontend/components/launches/creation.method.badge';
+import { BRAND_NAME } from '@gitroom/helpers/branding/branding';
 
 dayjs.extend(utc);
 export const metadata: Metadata = {
-  title: `${isGeneralServerSide() ? 'Postiz' : 'Gitroom'} Preview`,
+  title: `${isGeneralServerSide() ? BRAND_NAME : 'Gitroom'} Preview`,
   description: '',
 };
 export default async function Auth(
