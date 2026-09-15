@@ -7,6 +7,7 @@ import { EmailActivity } from '@gitroom/orchestrator/activities/email.activity';
 import { IntegrationsActivity } from '@gitroom/orchestrator/activities/integrations.activity';
 import { VideoActivity } from '@gitroom/orchestrator/activities/video.activity';
 import { VideoModule } from '@gitroom/nestjs-libraries/videos/video.module';
+import { PlannerActivity } from '@gitroom/orchestrator/activities/planner.activity';
 import { HealthController } from '@gitroom/orchestrator/health.controller';
 
 const activities = [
@@ -15,6 +16,7 @@ const activities = [
   EmailActivity,
   IntegrationsActivity,
   VideoActivity,
+  PlannerActivity,
 ];
 @Module({
   imports: [

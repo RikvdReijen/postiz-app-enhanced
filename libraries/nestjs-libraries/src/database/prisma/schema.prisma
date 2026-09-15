@@ -44,6 +44,9 @@ model Organization {
   webhooks            Webhooks[]
   oauthApp            OAuthApp[]
   oauthAuthorizations OAuthAuthorization[]
+  driveSync           DriveSyncState?
+  plannerSettings     PlannerSettings?
+  quickAccessTags     QuickAccessTag[]
 
   @@index([apiKey])
   @@index([streakSince])
@@ -346,6 +349,7 @@ model Integration {
   orderItems            OrderItems[]
   plugs                 Plugs[]
   posts                 Post[]
+  quickAccessTags       QuickAccessTag[]
 
   @@unique([organizationId, internalId])
   @@index([rootInternalId])
@@ -980,4 +984,81 @@ model Announcement {
   description String
   color       AnnouncementColor @default(INFO)
   createdAt   DateTime          @default(now())
+}
+
+// --- PostPls ---------------------------------------------------------------
+// Everything below is additive to upstream Postiz. All columns are optional or
+// defaulted so an existing database can be migrated forward without a backfill.
+
+/// Google Drive sync state for an organization. The Drive bundle is the
+/// hand-off point between the host and the PostPls Android app, so the app can
+/// keep drafting and scheduling while the host is powered off.
+model DriveSyncState {
+  id             String       @id @default(uuid())
+  organizationId String       @unique
+  enabled        Boolean      @default(false)
+  accountEmail   String?
+  refreshToken   String?
+  folderId       String?
+  bundleFileId   String?
+  revision       Int          @default(0)
+  lastPulledAt   DateTime?
+  lastPushedAt   DateTime?
+  lastError      String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([enabled])
+}
+
+/// Controls how often the planner sweeps for posts that are due but were never
+/// picked up. Defaults reproduce upstream behaviour exactly (hourly, 48h back).
+model PlannerSettings {
+  id                  String       @id @default(uuid())
+  organizationId      String       @unique
+  scanIntervalMinutes Int          @default(60)
+  lookbackHours       Int          @default(48)
+  paused              Boolean      @default(false)
+  lastScanAt          DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  organization        Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([lastScanAt])
+}
+
+/// A printable QR code / writable NFC tag that deep links into PostPls, either
+/// to a screen, to a provider, or to one specific connected account.
+model QuickAccessTag {
+  id                 String            @id @default(uuid())
+  organizationId     String
+  name               String
+  target             QuickAccessTarget @default(CALENDAR)
+  integrationId      String?
+  providerIdentifier String?
+  logo               String?
+  accentColor        String?
+  scans              Int               @default(0)
+  lastScannedAt      DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  deletedAt          DateTime?
+  integration        Integration?      @relation(fields: [integrationId], references: [id])
+  organization       Organization      @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([integrationId])
+  @@index([deletedAt])
+}
+
+enum QuickAccessTarget {
+  CALENDAR
+  NEW_POST
+  ANALYTICS
+  SETTINGS
+  PROVIDER
+  ACCOUNT
 }
