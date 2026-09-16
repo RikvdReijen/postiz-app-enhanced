@@ -6,6 +6,11 @@ name: PostPls debug APK
 on:
   release:
     types: [published]
+  # A pushed debug tag builds the APK as a workflow artifact. Publishing a
+  # release from that tag afterwards re-runs this and attaches the APK to it.
+  push:
+    tags:
+      - 'v*-debug'
   workflow_dispatch:
     inputs:
       postplsHost:
