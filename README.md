@@ -1,4 +1,34 @@
 <p align="center">
+  <img alt="PostPls" src="apps/frontend/public/postpls/envelope-pray.svg" width="96" />
+</p>
+
+<h1 align="center">PostPls ✉️🙏</h1>
+<p align="center"><strong>Opinionated version of <a href="https://github.com/gitroomhq/postiz-app">Postiz</a></strong></p>
+
+PostPls is a fork of Postiz that adds the things a self-hoster wants when the
+machine running it is a desktop that gets switched off:
+
+- **An Android app** that keeps drafting and rescheduling while the host is off,
+  syncing through a bundle in your own Google Drive.
+- **A host status indicator**, so you can tell "the machine is off" from "the
+  machine is on but the orchestrator is down".
+- **A configurable planner**, so you decide how often it sweeps for posts that
+  were due but never went out.
+- **Printable QR codes and writable NFC tags** that jump straight to a screen, a
+  platform, or one specific connected account.
+- **Shake to report a bug**, tagged as a PostPls bug or an upstream one, batched
+  on a countdown so a bad afternoon costs one fix run instead of ten — see
+  [docs/BUG_REPORTS.md](docs/BUG_REPORTS.md).
+
+It tracks upstream Postiz closely and deliberately keeps its own diff small —
+see [docs/FORK.md](docs/FORK.md) for how that is maintained, and
+[apps/mobile/README.md](apps/mobile/README.md) for the app.
+
+Everything below is upstream Postiz's own README.
+
+---
+
+<p align="center">
   <a href="https://postiz.com/" target="_blank">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/765e9d72-3ee7-4a56-9d59-a2c9befe2311">

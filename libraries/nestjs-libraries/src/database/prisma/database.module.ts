@@ -48,6 +48,20 @@ import { ErrorsService } from '@gitroom/nestjs-libraries/database/prisma/errors/
 import { AdminStatsRepository } from '@gitroom/nestjs-libraries/database/prisma/admin-stats/admin-stats.repository';
 import { AdminStatsService } from '@gitroom/nestjs-libraries/database/prisma/admin-stats/admin-stats.service';
 
+import { GoogleDriveProvider } from '@gitroom/nestjs-libraries/drive-sync/google.drive.provider';
+import { DriveSyncRepository } from '@gitroom/nestjs-libraries/database/prisma/drive-sync/drive.sync.repository';
+import { DriveSyncService } from '@gitroom/nestjs-libraries/database/prisma/drive-sync/drive.sync.service';
+import { PlannerRepository } from '@gitroom/nestjs-libraries/database/prisma/planner/planner.repository';
+import { PlannerService } from '@gitroom/nestjs-libraries/database/prisma/planner/planner.service';
+import { QuickAccessRepository } from '@gitroom/nestjs-libraries/database/prisma/quick-access/quick.access.repository';
+import { QuickAccessService } from '@gitroom/nestjs-libraries/database/prisma/quick-access/quick.access.service';
+import { BugReportRepository } from '@gitroom/nestjs-libraries/database/prisma/bug-reports/bug.report.repository';
+import { BugReportService } from '@gitroom/nestjs-libraries/database/prisma/bug-reports/bug.report.service';
+import { BugTrackerProvider } from '@gitroom/nestjs-libraries/bug-reports/bug.tracker.provider';
+import { HostRepository } from '@gitroom/nestjs-libraries/database/prisma/host/host.repository';
+import { HostStatusService } from '@gitroom/nestjs-libraries/host/host.status.service';
+import { MobilePairingService } from '@gitroom/nestjs-libraries/mobile/mobile.pairing.service';
+
 @Global()
 @Module({
   imports: [],
@@ -103,6 +117,19 @@ import { AdminStatsService } from '@gitroom/nestjs-libraries/database/prisma/adm
     ErrorsService,
     AdminStatsRepository,
     AdminStatsService,
+    GoogleDriveProvider,
+    DriveSyncRepository,
+    DriveSyncService,
+    PlannerRepository,
+    PlannerService,
+    QuickAccessRepository,
+    QuickAccessService,
+    BugTrackerProvider,
+    BugReportRepository,
+    BugReportService,
+    HostRepository,
+    HostStatusService,
+    MobilePairingService,
   ],
   get exports() {
     return this.providers;

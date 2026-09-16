@@ -32,6 +32,11 @@ import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { SVGLine } from '@gitroom/frontend/components/launches/launches.component';
 import { GlobalSettings } from '@gitroom/frontend/components/settings/global.settings';
 import { ApprovedAppsComponent } from '@gitroom/frontend/components/approved-apps/approved-apps.component';
+import { DriveSync } from '@gitroom/frontend/components/postpls/drive.sync';
+import { PlannerSettings } from '@gitroom/frontend/components/postpls/planner.settings';
+import { QuickAccess } from '@gitroom/frontend/components/postpls/quick.access';
+import { MobilePairing } from '@gitroom/frontend/components/postpls/mobile.pairing';
+import { BugReports } from '@gitroom/frontend/components/postpls/bug.reports';
 export const SettingsPopup: FC<{
   getRef?: Ref<any>;
 }> = (props) => {
@@ -107,6 +112,12 @@ export const SettingsPopup: FC<{
       arr.push({ tab: 'api', label: t('developers', 'Developers') });
     }
     arr.push({ tab: 'approved_apps', label: t('approved_apps', 'Approved Apps') });
+    // PostPls additions — self-hosted features, so no tier gating.
+    arr.push({ tab: 'planner', label: t('planner', 'Planner') });
+    arr.push({ tab: 'drive_sync', label: t('drive_sync', 'Google Drive Sync') });
+    arr.push({ tab: 'quick_access', label: t('quick_access', 'Quick Access') });
+    arr.push({ tab: 'mobile_app', label: t('mobile_app', 'Mobile App') });
+    arr.push({ tab: 'bug_reports', label: t('bug_reports', 'Bug Reports') });
 
     return arr;
   }, [user, isGeneral, showLogout, t]);
@@ -207,6 +218,36 @@ export const SettingsPopup: FC<{
               {tab === 'approved_apps' && (
                 <div>
                   <ApprovedAppsComponent />
+                </div>
+              )}
+
+              {tab === 'planner' && (
+                <div>
+                  <PlannerSettings />
+                </div>
+              )}
+
+              {tab === 'drive_sync' && (
+                <div>
+                  <DriveSync />
+                </div>
+              )}
+
+              {tab === 'quick_access' && (
+                <div>
+                  <QuickAccess />
+                </div>
+              )}
+
+              {tab === 'mobile_app' && (
+                <div>
+                  <MobilePairing />
+                </div>
+              )}
+
+              {tab === 'bug_reports' && (
+                <div>
+                  <BugReports />
                 </div>
               )}
             </div>

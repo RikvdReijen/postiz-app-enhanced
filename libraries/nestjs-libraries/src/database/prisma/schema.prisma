@@ -44,6 +44,11 @@ model Organization {
   webhooks            Webhooks[]
   oauthApp            OAuthApp[]
   oauthAuthorizations OAuthAuthorization[]
+  driveSync           DriveSyncState?
+  plannerSettings     PlannerSettings?
+  quickAccessTags     QuickAccessTag[]
+  bugReports          BugReport[]
+  bugReportSettings   BugReportSettings?
 
   @@index([apiKey])
   @@index([streakSince])
@@ -116,6 +121,7 @@ model User {
   sendFailureEmails     Boolean              @default(true)
   sendStreakEmails      Boolean              @default(true)
   oauthAuthorizations   OAuthAuthorization[]
+  bugReports            BugReport[]
 
   @@unique([email, providerName])
   @@index([lastReadNotifications])
@@ -346,6 +352,7 @@ model Integration {
   orderItems            OrderItems[]
   plugs                 Plugs[]
   posts                 Post[]
+  quickAccessTags       QuickAccessTag[]
 
   @@unique([organizationId, internalId])
   @@index([rootInternalId])
@@ -980,4 +987,153 @@ model Announcement {
   description String
   color       AnnouncementColor @default(INFO)
   createdAt   DateTime          @default(now())
+}
+
+// --- PostPls ---------------------------------------------------------------
+// Everything below is additive to upstream Postiz. All columns are optional or
+// defaulted so an existing database can be migrated forward without a backfill.
+
+/// Google Drive sync state for an organization. The Drive bundle is the
+/// hand-off point between the host and the PostPls Android app, so the app can
+/// keep drafting and scheduling while the host is powered off.
+model DriveSyncState {
+  id             String       @id @default(uuid())
+  organizationId String       @unique
+  enabled        Boolean      @default(false)
+  accountEmail   String?
+  refreshToken   String?
+  folderId       String?
+  bundleFileId   String?
+  revision       Int          @default(0)
+  lastPulledAt   DateTime?
+  lastPushedAt   DateTime?
+  lastError      String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([enabled])
+}
+
+/// Controls how often the planner sweeps for posts that are due but were never
+/// picked up. Defaults reproduce upstream behaviour exactly (hourly, 48h back).
+model PlannerSettings {
+  id                  String       @id @default(uuid())
+  organizationId      String       @unique
+  scanIntervalMinutes Int          @default(60)
+  lookbackHours       Int          @default(48)
+  paused              Boolean      @default(false)
+  lastScanAt          DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  organization        Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([lastScanAt])
+}
+
+/// A printable QR code / writable NFC tag that deep links into PostPls, either
+/// to a screen, to a provider, or to one specific connected account.
+model QuickAccessTag {
+  id                 String            @id @default(uuid())
+  organizationId     String
+  name               String
+  target             QuickAccessTarget @default(CALENDAR)
+  integrationId      String?
+  providerIdentifier String?
+  logo               String?
+  accentColor        String?
+  scans              Int               @default(0)
+  lastScannedAt      DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  deletedAt          DateTime?
+  integration        Integration?      @relation(fields: [integrationId], references: [id])
+  organization       Organization      @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([integrationId])
+  @@index([deletedAt])
+}
+
+enum QuickAccessTarget {
+  CALENDAR
+  NEW_POST
+  ANALYTICS
+  SETTINGS
+  PROVIDER
+  ACCOUNT
+}
+
+/// A bug report raised from the app, usually by shaking the phone.
+///
+/// `scope` is what makes this useful on a fork: a bug in PostPls' own surface
+/// is ours to fix and can become a GitHub issue, while a bug inherited from
+/// upstream Postiz belongs in gitroomhq's tracker, which we cannot file into.
+model BugReport {
+  id             String          @id @default(uuid())
+  organizationId String
+  userId         String?
+  scope          BugScope        @default(POSTPLS)
+  status         BugReportStatus @default(NEW)
+  title          String
+  description    String
+  /// Where the reporter was when they shook the phone.
+  route          String?
+  platform       String?
+  appVersion     String?
+  /// JSON: host reachability, sync state, device details at the time.
+  diagnostics    String?
+  /// Set once a batch has been handed to GitHub.
+  batchId        String?
+  dispatchedAt   DateTime?
+  githubIssueUrl String?
+  lastError      String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  user           User?           @relation(fields: [userId], references: [id])
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([batchId])
+  @@index([deletedAt])
+}
+
+/// Per-organization configuration for shake-to-report and what happens next.
+model BugReportSettings {
+  id                 String       @id @default(uuid())
+  organizationId     String       @unique
+  shakeEnabled       Boolean      @default(false)
+  /// Peak acceleration, in m/s², before a movement counts as a shake.
+  shakeThreshold     Int          @default(18)
+  /// How long reports accumulate before a batch is dispatched. Batching is the
+  /// point: one cloud session for ten related reports instead of ten sessions.
+  batchWindowMinutes Int          @default(360)
+  githubEnabled      Boolean      @default(false)
+  /// owner/repo. Falls back to POSTPLS_GITHUB_REPOSITORY when unset.
+  githubRepository   String?
+  /// Fire a repository_dispatch so a workflow can pick the batch up.
+  autoFixEnabled     Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  organization       Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+enum BugScope {
+  /// PostPls' own surface: Drive sync, planner, quick access, the app, branding.
+  POSTPLS
+  /// Inherited from upstream Postiz.
+  UPSTREAM
+}
+
+enum BugReportStatus {
+  NEW
+  DISPATCHED
+  FILED
+  FAILED
 }

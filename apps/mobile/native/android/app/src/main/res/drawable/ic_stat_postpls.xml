@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Status-bar icons are drawn as a silhouette, so this is the envelope-and-hands
+  mark reduced to a single flat shape rather than the full-colour logo.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64"
+    android:tint="#FFFFFF">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M13,31 L51,31 A5,5 0 0 1 56,36 L56,47 A5,5 0 0 1 51,52 L13,52 A5,5 0 0 1 8,47 L8,36 A5,5 0 0 1 13,31 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M31,9.5 C28.4,11.4 25.8,15.6 24.3,20.1 C23.2,23.5 22.7,26.7 22.5,29.2 C22.4,30.4 23.3,31.4 24.5,31.4 L31,31.4 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M33,9.5 C35.6,11.4 38.2,15.6 39.7,20.1 C40.8,23.5 41.3,26.7 41.5,29.2 C41.6,30.4 40.7,31.4 39.5,31.4 L33,31.4 Z" />
+</vector>

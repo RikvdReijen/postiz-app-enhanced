@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --new-bgColor: #0e0e0e;
+  --new-bgColorInner: #1a1919;
+  --new-bgLineColor: #212121;
+  --new-border: #252525;
+  --new-textColor: 255 255 255;
+  --new-textItemBlur: #999999;
+  --new-btn-primary: #612bd3;
+  --new-btn-simple: #313030;
+  --new-box-hover: #201f1f;
+  --new-ai-btn: #d82d7e;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--new-bgColor);
+  color: rgb(var(--new-textColor));
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* Keeps content clear of the status bar and the gesture pill. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}

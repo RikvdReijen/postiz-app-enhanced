@@ -52,6 +52,15 @@ import { WalletProvider } from '@gitroom/backend/services/auth/providers/wallet.
 import { OauthProvider } from '@gitroom/backend/services/auth/providers/oauth.provider';
 import { StripeController } from '@gitroom/backend/api/routes/stripe.controller';
 
+import { DriveSyncController } from '@gitroom/backend/api/routes/drive-sync.controller';
+import { PlannerController } from '@gitroom/backend/api/routes/planner.controller';
+import { QuickAccessController } from '@gitroom/backend/api/routes/quick-access.controller';
+import { QuickAccessPublicController } from '@gitroom/backend/api/routes/quick-access-public.controller';
+import { HostController } from '@gitroom/backend/api/routes/host.controller';
+import { HostHealthController } from '@gitroom/backend/api/routes/host-health.controller';
+import { MobileController } from '@gitroom/backend/api/routes/mobile.controller';
+import { BugReportsController } from '@gitroom/backend/api/routes/bug-reports.controller';
+
 const authenticatedController = [
   UsersController,
   AnalyticsController,
@@ -72,6 +81,12 @@ const authenticatedController = [
   OAuthAuthorizedController,
   AnnouncementsController,
   AdminController,
+  DriveSyncController,
+  PlannerController,
+  QuickAccessController,
+  HostHealthController,
+  MobileController,
+  BugReportsController,
 ];
 @Module({
   imports: [UploadModule],
@@ -84,6 +99,8 @@ const authenticatedController = [
         AuthController,
         PublicController,
         MonitorController,
+        HostController,
+        QuickAccessPublicController,
         EnterpriseController,
         NoAuthIntegrationsController,
         OAuthController,

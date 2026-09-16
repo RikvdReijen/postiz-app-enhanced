@@ -1,0 +1,92 @@
+name: PostPls debug APK
+
+# Builds the Android debug APK. Runs on a published release so a debugging
+# pre-release gets a downloadable build attached to it, and on demand for
+# testing a branch.
+on:
+  release:
+    types: [published]
+  # A pushed debug tag builds the APK as a workflow artifact. Publishing a
+  # release from that tag afterwards re-runs this and attaches the APK to it.
+  push:
+    tags:
+      - 'v*-debug'
+  workflow_dispatch:
+    inputs:
+      postplsHost:
+        description: Host domain used to verify Android App Links
+        required: false
+        default: postpls.local
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      # prisma generate runs from the root postinstall and wants the variable
+      # present. It never connects, so a placeholder is enough.
+      DATABASE_URL: postgresql://postpls:postpls@localhost:5432/postpls
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.6.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the mobile web bundle
+        run: pnpm --filter ./apps/mobile run build
+
+      - name: Generate the Android project
+        run: pnpm --filter ./apps/mobile run setup:android
+
+      - name: Resolve the App Links host
+        id: host
+        # A release build uses the repository variable when one is set, so a
+        # tagged build verifies against the real host rather than the default.
+        run: |
+          HOST="${{ github.event.inputs.postplsHost || vars.POSTPLS_HOST || 'postpls.local' }}"
+          echo "value=$HOST" >> "$GITHUB_OUTPUT"
+
+      - name: Build the debug APK
+        working-directory: apps/mobile/android
+        run: ./gradlew assembleDebug -PpostplsHost=${{ steps.host.outputs.value }}
+
+      - name: Name the artifact
+        id: apk
+        run: |
+          SRC=$(find apps/mobile/android -name '*-debug.apk' | head -n1)
+          test -n "$SRC" || { echo "No APK produced"; exit 1; }
+          DEST="postpls-debug-${GITHUB_REF_NAME//\//-}.apk"
+          cp "$SRC" "$DEST"
+          echo "path=$DEST" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: postpls-debug-apk
+          path: ${{ steps.apk.outputs.path }}
+          retention-days: 30
+
+      - name: Attach the APK to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "${{ steps.apk.outputs.path }}" --clobber
