@@ -24,6 +24,14 @@ import {
 } from '@postpls/state/sync';
 import { HostHealth, HostTransport } from '@postpls/state/host.transport';
 import { AppWatcher, HostWake } from '@postpls/native/plugins';
+import {
+  flushQueue,
+  loadQueue,
+  queueReport,
+  QueuedBugReport,
+} from '@postpls/state/bug.reports';
+import { useShake } from '@postpls/use.shake';
+import { BugReportScreen } from '@postpls/screens/bug.report';
 import { PairScreen } from '@postpls/screens/pair';
 import { HomeScreen } from '@postpls/screens/home';
 import { ComposerScreen } from '@postpls/screens/composer';
@@ -50,6 +58,8 @@ export const App: FC = () => {
   const [composing, setComposing] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [booted, setBooted] = useState(false);
+  const [reporting, setReporting] = useState(false);
+  const [queuedReports, setQueuedReports] = useState(0);
 
   useEffect(() => {
     const boot = async () => {
@@ -65,6 +75,7 @@ export const App: FC = () => {
         setBundle(await loadBundle(storedPairing.organizationId));
       }
 
+      setQueuedReports((await loadQueue()).length);
       setBooted(true);
     };
 
@@ -85,6 +96,11 @@ export const App: FC = () => {
       setHealth(
         result.hostOnline ? await new HostTransport(pairing).health() : null
       );
+
+      if (result.hostOnline) {
+        const { remaining } = await flushQueue(pairing);
+        setQueuedReports(remaining);
+      }
     } finally {
       setSyncing(false);
     }
@@ -239,6 +255,22 @@ export const App: FC = () => {
     }
   }, [settings.hostMacAddress]);
 
+  const saveReport = useCallback(
+    async (report: QueuedBugReport) => {
+      const queue = await queueReport(report);
+      setQueuedReports(queue.length);
+      setReporting(false);
+      runSyncRef.current();
+    },
+    []
+  );
+
+  useShake(settings.shakeEnabled, settings.shakeThreshold, () => {
+    setComposing(false);
+    setEditing(null);
+    setReporting(true);
+  });
+
   const unpair = useCallback(async () => {
     await clearPairing();
     setPairing(null);
@@ -271,7 +303,25 @@ export const App: FC = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-auto">
-        {composing || editing ? (
+        {reporting ? (
+          <BugReportScreen
+            hostOnline={!!outcome?.hostOnline}
+            queued={queuedReports}
+            diagnostics={{
+              at: new Date().toISOString(),
+              hostOnline: !!outcome?.hostOnline,
+              syncRoute: outcome?.route ?? 'none',
+              syncError: outcome?.error ?? null,
+              health,
+              posts: currentBundle.posts.length,
+              revision: currentBundle.revision,
+              userAgent:
+                typeof navigator !== 'undefined' ? navigator.userAgent : null,
+            }}
+            onSubmit={saveReport}
+            onCancel={() => setReporting(false)}
+          />
+        ) : composing || editing ? (
           <ComposerScreen
             bundle={currentBundle}
             postId={editing}

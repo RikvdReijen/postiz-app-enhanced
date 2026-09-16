@@ -48,18 +48,20 @@ pnpm install                       # from the repo root
 pnpm --filter ./apps/mobile run setup:android
 ```
 
-`setup:android` runs `npx cap add android` once and then copies
-`native/android` over the generated project. After that:
+`setup:android` runs `npx cap add android` once, copies `native/android` over
+the generated project, and applies the Gradle additions our native sources need
+(Play Services auth, and the `postplsHost` manifest placeholder). It is
+idempotent, so it is safe to re-run after `cap sync`. After that:
 
-1. Merge `native/android/app/build.gradle.snippet` into `android/app/build.gradle`
-   — it adds the Play Services auth dependency and the `postplsHost` manifest
-   placeholder.
-2. For the Drive fallback, create an OAuth client for Android in Google Cloud
+1. For the Drive fallback, create an OAuth client for Android in Google Cloud
    with the `drive.file` scope and drop `google-services.json` into
    `android/app/`. Without it the app still works against the host; it just has
    no offline route.
-3. Build with your host's domain so App Links verify against it:
-   `./gradlew assembleDebug -PpostplsHost=postiz.example.com`
+2. Build with your host's domain so App Links verify against it:
+   `cd android && ./gradlew assembleDebug -PpostplsHost=postiz.example.com`
+
+CI does all of this for you — see `.github/workflows/postpls-mobile-debug-apk.yml`,
+which builds the debug APK and attaches it to a release.
 
 Then `pnpm --filter ./apps/mobile run open:android`.
 

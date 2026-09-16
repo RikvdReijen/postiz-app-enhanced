@@ -16,6 +16,9 @@ machine running it is a desktop that gets switched off:
   were due but never went out.
 - **Printable QR codes and writable NFC tags** that jump straight to a screen, a
   platform, or one specific connected account.
+- **Shake to report a bug**, tagged as a PostPls bug or an upstream one, batched
+  on a countdown so a bad afternoon costs one fix run instead of ten — see
+  [docs/BUG_REPORTS.md](docs/BUG_REPORTS.md).
 
 It tracks upstream Postiz closely and deliberately keeps its own diff small —
 see [docs/FORK.md](docs/FORK.md) for how that is maintained, and

@@ -10,6 +10,9 @@ export const BRAND_NAME = 'PostPls';
 export const BRAND_EMOJI = '✉️🙏';
 export const BRAND_TAGLINE = 'Opinionated version of Postiz';
 export const BRAND_UPSTREAM_NAME = 'Postiz';
+/** Where an upstream-scope bug report is told to go. */
+export const BRAND_UPSTREAM_REPOSITORY =
+  'https://github.com/gitroomhq/postiz-app';
 
 /**
  * Custom scheme used by QR codes, NFC tags and the Android app so a scan can

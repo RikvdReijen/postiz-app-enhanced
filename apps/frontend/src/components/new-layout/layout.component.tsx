@@ -37,6 +37,7 @@ import { LanguageComponent } from '@gitroom/frontend/components/layout/language.
 import { ChromeExtensionComponent } from '@gitroom/frontend/components/layout/chrome.extension.component';
 import NotificationComponent from '@gitroom/frontend/components/notifications/notification.component';
 import { HostStatus } from '@gitroom/frontend/components/postpls/host.status';
+import { ShakeListener } from '@gitroom/frontend/components/postpls/shake.listener';
 import { OrganizationSelector } from '@gitroom/frontend/components/layout/organization.selector';
 import { StreakComponent } from '@gitroom/frontend/components/layout/streak.component';
 import { PreConditionComponent } from '@gitroom/frontend/components/layout/pre-condition.component';
@@ -144,6 +145,7 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
                           <NotificationComponent />
                           <div className="w-[1px] h-[20px] bg-blockSeparator" />
                           <HostStatus />
+                          <ShakeListener />
                         </div>
                       </div>
                       <div className="flex flex-1 gap-[1px]">{children}</div>

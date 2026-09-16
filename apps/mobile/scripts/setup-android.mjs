@@ -25,9 +25,9 @@ execSync('node scripts/apply-overlay.mjs', { cwd: root, stdio: 'inherit' });
 
 console.log(`
 Next steps:
-  1. Merge native/android/app/build.gradle.snippet into android/app/build.gradle.
-  2. Put your Google OAuth client's google-services.json in android/app/ if you
+  1. Put your Google OAuth client's google-services.json in android/app/ if you
      want the Drive fallback (the app works against the host without it).
-  3. Set the host for App Links:  ./gradlew -PpostplsHost=postiz.example.com ...
-  4. pnpm run open:android
+  2. Build with your own host so App Links verify against it:
+       cd android && ./gradlew assembleDebug -PpostplsHost=postiz.example.com
+  3. pnpm run open:android
 `);

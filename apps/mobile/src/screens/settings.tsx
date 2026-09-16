@@ -158,6 +158,34 @@ export const SettingsScreen: FC<{
       </Card>
 
       <Card>
+        <div className="text-[15px]">Bug reports</div>
+        <div className="text-[13px] text-textItemBlur">
+          Shake the phone to report whatever just went wrong. Reports queue on
+          the device when the host is off and send on the next sync.
+        </div>
+
+        <Toggle
+          label="Shake to report a bug"
+          checked={settings.shakeEnabled}
+          onChange={(shakeEnabled) => update({ shakeEnabled })}
+        />
+
+        {settings.shakeEnabled && (
+          <Field label="Shake sensitivity (lower is more sensitive)">
+            <TextInput
+              type="number"
+              min={8}
+              max={40}
+              value={settings.shakeThreshold}
+              onChange={(e) =>
+                update({ shakeThreshold: Number(e.target.value) })
+              }
+            />
+          </Field>
+        )}
+      </Card>
+
+      <Card>
         <div className="text-[15px]">Host</div>
         <Field label="Host MAC address (for Wake-on-LAN)">
           <TextInput

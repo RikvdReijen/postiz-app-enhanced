@@ -47,6 +47,8 @@ model Organization {
   driveSync           DriveSyncState?
   plannerSettings     PlannerSettings?
   quickAccessTags     QuickAccessTag[]
+  bugReports          BugReport[]
+  bugReportSettings   BugReportSettings?
 
   @@index([apiKey])
   @@index([streakSince])
@@ -119,6 +121,7 @@ model User {
   sendFailureEmails     Boolean              @default(true)
   sendStreakEmails      Boolean              @default(true)
   oauthAuthorizations   OAuthAuthorization[]
+  bugReports            BugReport[]
 
   @@unique([email, providerName])
   @@index([lastReadNotifications])
@@ -1061,4 +1064,76 @@ enum QuickAccessTarget {
   SETTINGS
   PROVIDER
   ACCOUNT
+}
+
+/// A bug report raised from the app, usually by shaking the phone.
+///
+/// `scope` is what makes this useful on a fork: a bug in PostPls' own surface
+/// is ours to fix and can become a GitHub issue, while a bug inherited from
+/// upstream Postiz belongs in gitroomhq's tracker, which we cannot file into.
+model BugReport {
+  id             String          @id @default(uuid())
+  organizationId String
+  userId         String?
+  scope          BugScope        @default(POSTPLS)
+  status         BugReportStatus @default(NEW)
+  title          String
+  description    String
+  /// Where the reporter was when they shook the phone.
+  route          String?
+  platform       String?
+  appVersion     String?
+  /// JSON: host reachability, sync state, device details at the time.
+  diagnostics    String?
+  /// Set once a batch has been handed to GitHub.
+  batchId        String?
+  dispatchedAt   DateTime?
+  githubIssueUrl String?
+  lastError      String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  user           User?           @relation(fields: [userId], references: [id])
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([batchId])
+  @@index([deletedAt])
+}
+
+/// Per-organization configuration for shake-to-report and what happens next.
+model BugReportSettings {
+  id                 String       @id @default(uuid())
+  organizationId     String       @unique
+  shakeEnabled       Boolean      @default(false)
+  /// Peak acceleration, in m/s², before a movement counts as a shake.
+  shakeThreshold     Int          @default(18)
+  /// How long reports accumulate before a batch is dispatched. Batching is the
+  /// point: one cloud session for ten related reports instead of ten sessions.
+  batchWindowMinutes Int          @default(360)
+  githubEnabled      Boolean      @default(false)
+  /// owner/repo. Falls back to POSTPLS_GITHUB_REPOSITORY when unset.
+  githubRepository   String?
+  /// Fire a repository_dispatch so a workflow can pick the batch up.
+  autoFixEnabled     Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  organization       Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+enum BugScope {
+  /// PostPls' own surface: Drive sync, planner, quick access, the app, branding.
+  POSTPLS
+  /// Inherited from upstream Postiz.
+  UPSTREAM
+}
+
+enum BugReportStatus {
+  NEW
+  DISPATCHED
+  FILED
+  FAILED
 }

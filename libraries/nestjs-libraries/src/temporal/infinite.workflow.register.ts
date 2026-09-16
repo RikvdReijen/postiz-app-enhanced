@@ -3,6 +3,7 @@ import { TemporalService } from 'nestjs-temporal-core';
 
 const LEGACY_MISSING_POST_WORKFLOW_ID = 'missing-post-workflow';
 const MISSING_POST_WORKFLOW_ID = 'missing-post-workflow-v2';
+const BUG_REPORT_BATCH_WORKFLOW_ID = 'bug-report-batch-workflow-v1';
 
 @Injectable()
 export class InfiniteWorkflowRegister implements OnModuleInit {
@@ -28,6 +29,15 @@ export class InfiniteWorkflowRegister implements OnModuleInit {
           ?.getRawClient()
           ?.workflow?.start('missingPostWorkflowV2', {
             workflowId: MISSING_POST_WORKFLOW_ID,
+            taskQueue: 'main',
+          });
+      } catch (err) {}
+
+      try {
+        await this._temporalService.client
+          ?.getRawClient()
+          ?.workflow?.start('bugReportBatchWorkflowV1', {
+            workflowId: BUG_REPORT_BATCH_WORKFLOW_ID,
             taskQueue: 'main',
           });
       } catch (err) {}

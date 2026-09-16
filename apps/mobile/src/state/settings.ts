@@ -1,4 +1,5 @@
 import { BRAND_DEEP_LINK_SCHEME } from '@gitroom/helpers/branding/branding';
+import { DEFAULT_SHAKE_THRESHOLD } from '@gitroom/helpers/shake/shake.detector';
 import { quickAccessDeepLink } from '@gitroom/helpers/branding/quick.access.link';
 import { readJson, STORAGE_KEYS, writeJson } from '@postpls/state/storage';
 
@@ -24,6 +25,10 @@ export interface MobileSettings {
   quickActions: QuickAction[];
   /** MAC address of the host machine, for the Wake-on-LAN button. */
   hostMacAddress: string;
+  /** Shake the phone to open the bug report screen. */
+  shakeEnabled: boolean;
+  /** Peak acceleration in m/s² before a movement counts as a shake. */
+  shakeThreshold: number;
 }
 
 export const DEFAULT_SETTINGS: MobileSettings = {
@@ -46,6 +51,8 @@ export const DEFAULT_SETTINGS: MobileSettings = {
     { id: 'sync', label: 'Sync now', deepLink: `${BRAND_DEEP_LINK_SCHEME}://action?do=sync` },
   ],
   hostMacAddress: '',
+  shakeEnabled: false,
+  shakeThreshold: DEFAULT_SHAKE_THRESHOLD,
 };
 
 export const loadSettings = async (): Promise<MobileSettings> => ({

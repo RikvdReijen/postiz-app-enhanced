@@ -141,6 +141,9 @@ are narrow:
   run with `pnpm run test:helpers`. Nine cases, including the one that matters
   most — that two devices merging the same conflict independently reach the
   same answer.
+- `createShakeDetector` — pure, and shared by both apps, so a regression would
+  change behaviour in two places at once. **Done:**
+  `libraries/helpers/src/shake/shake.detector.spec.ts`.
 - `PlannerService.getOrganizationsDueForScan` — the defaults must keep
   reproducing upstream's hourly/48h behaviour. **Not done.**
 - A smoke test that boots the Nest app and asserts the six PostPls routes

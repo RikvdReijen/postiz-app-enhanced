@@ -59,6 +59,7 @@ import { QuickAccessPublicController } from '@gitroom/backend/api/routes/quick-a
 import { HostController } from '@gitroom/backend/api/routes/host.controller';
 import { HostHealthController } from '@gitroom/backend/api/routes/host-health.controller';
 import { MobileController } from '@gitroom/backend/api/routes/mobile.controller';
+import { BugReportsController } from '@gitroom/backend/api/routes/bug-reports.controller';
 
 const authenticatedController = [
   UsersController,
@@ -85,6 +86,7 @@ const authenticatedController = [
   QuickAccessController,
   HostHealthController,
   MobileController,
+  BugReportsController,
 ];
 @Module({
   imports: [UploadModule],
